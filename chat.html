@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat ❤️</title>
+
+<style>
+:root {
+  --navy:#0A1931;
+  --left:#1A3D63;
+  --right:#e8a0b0;
+}
+
+body {
+  margin:0;
+  background:var(--navy);
+  font-family:Segoe UI;
+  color:white;
+}
+
+/* CHAT AREA */
+.chat-container {
+  padding:20px;
+  padding-bottom:100px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* MESSAGE */
+.msg {
+  padding:12px 16px;
+  border-radius:18px;
+  max-width:75%;
+  font-size:1rem;
+  opacity:0;
+  transform:translateY(20px);
+  transition:0.4s;
+}
+
+.left {
+  background:var(--left);
+  align-self:flex-start;
+  border-bottom-left-radius:5px;
+}
+
+.right {
+  background:rgba(232,160,176,0.3);
+  align-self:flex-end;
+  border-bottom-right-radius:5px;
+}
+
+.show {
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* TYPING */
+.typing {
+  font-size:0.9rem;
+  opacity:0.7;
+}
+
+.typing span {
+  animation: blink 1.4s infinite;
+}
+
+.typing span:nth-child(2){ animation-delay:0.2s; }
+.typing span:nth-child(3){ animation-delay:0.4s; }
+
+@keyframes blink {
+  0%,80%,100%{ opacity:0; }
+  40%{ opacity:1; }
+}
+
+/* BUTTON */
+#nextBtn {
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:14px 30px;
+  background:#e8c97a;
+  border:none;
+  border-radius:25px;
+  cursor:pointer;
+  font-weight:bold;
+  display:none;
+  box-shadow:0 0 15px rgba(232,201,122,0.4);
+}
+
+#nextBtn:hover {
+  transform:translateX(-50%) scale(1.1);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="chat-container" id="chat"></div>
+
+<button id="nextBtn" onclick="nextPage()">Continue ❤️</button>
+
+<script>
+
+/* CHAT DATA */
+const messages = [
+  {text:"Hi ❤️", side:"right"},
+  {text:"Hii 😊", side:"left"},
+  {text:"Happy Birthday Khushi 🎂❤️", side:"right"},
+  {text:"Awww thank you 😌❤️", side:"left"},
+
+  {text:"I wanted to make this day special for you...", side:"right"},
+  {text:"So I made something just for you ❤️", side:"right"},
+  {text:"You don’t even know how much you mean to me", side:"right"},
+  {text:"Your smile makes everything better 😌", side:"right"},
+  {text:"Even my worst days feel okay because of you", side:"right"},
+  {text:"You are not just special…", side:"right"},
+  {text:"You are everything ❤️", side:"right"},
+  {text:"I’m really lucky to have you in my life", side:"right"},
+  {text:"And I never want to lose you 💕", side:"right"},
+  {text:"Today is your day…", side:"right"},
+  {text:"And I just want to see you happy always 😌", side:"right"}
+];
+
+const chat = document.getElementById("chat");
+const btn = document.getElementById("nextBtn");
+
+/* CREATE TYPING */
+function createTyping(side) {
+  const div = document.createElement("div");
+  div.className = `msg ${side} typing`;
+  div.innerHTML = "typing<span>.</span><span>.</span><span>.</span>";
+  chat.appendChild(div);
+  scrollDown();
+  return div;
+}
+
+/* AUTO SCROLL */
+function scrollDown() {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth"
+  });
+}
+
+/* TIMING SYSTEM */
+let totalDelay = 0;
+
+messages.forEach((msg, i) => {
+
+  const typingTime = 800 + Math.random() * 1200;   // realistic typing
+  const readTime   = Math.max(1800, msg.text.length * 70); // reading time
+
+  setTimeout(() => {
+
+    const typing = createTyping(msg.side);
+
+    setTimeout(() => {
+
+      typing.remove();
+
+      const div = document.createElement("div");
+      div.className = `msg ${msg.side}`;
+      div.innerText = msg.text;
+
+      chat.appendChild(div);
+
+      setTimeout(() => div.classList.add("show"), 50);
+
+      scrollDown();
+
+      if (i === messages.length - 1) {
+        setTimeout(() => {
+          btn.style.display = "block";
+        }, 1200);
+      }
+
+    }, typingTime);
+
+  }, totalDelay);
+
+  totalDelay += typingTime + readTime;
+
+});
+
+/* NEXT PAGE */
+function nextPage() {
+  window.location.href = "flower.html";
+}
+
+</script>
+
+</body>
+</html>

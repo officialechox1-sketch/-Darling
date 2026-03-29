@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You ❤️</title>
+
+<style>
+:root {
+  --navy:#0A1931;
+  --gold:#e8c97a;
+  --rose:#e8a0b0;
+  --blue:#1A3D63;
+}
+
+body {
+  margin:0;
+  font-family:Segoe UI;
+  background:var(--navy);
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  flex-direction:column;
+  text-align:center;
+}
+
+/* ENVELOPE */
+.envelope {
+  width:200px;
+  height:140px;
+  background:var(--blue);
+  position:relative;
+  cursor:pointer;
+  margin-bottom:30px;
+  transition:0.6s;
+  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+}
+
+.envelope::before {
+  content:'';
+  position:absolute;
+  top:0;
+  border-left:100px solid transparent;
+  border-right:100px solid transparent;
+  border-top:70px solid #0f2a47;
+  transform-origin:top;
+  transition:0.6s;
+}
+
+.envelope.open::before {
+  transform:rotateX(180deg);
+}
+
+.letter {
+  position:absolute;
+  bottom:0;
+  left:10px;
+  width:180px;
+  height:120px;
+  background:white;
+  color:black;
+  padding:10px;
+  transform:translateY(0);
+  transition:0.6s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+.envelope.open .letter {
+  transform:translateY(-60px);
+}
+
+/* TEXT */
+h1 {
+  color:var(--rose);
+  font-size:2.5rem;
+  margin-bottom:10px;
+}
+
+p {
+  opacity:0.8;
+  max-width:300px;
+}
+
+/* BUTTON */
+button {
+  margin-top:25px;
+  padding:12px 25px;
+  background:var(--gold);
+  border:none;
+  border-radius:25px;
+  cursor:pointer;
+  font-weight:bold;
+  transition:0.3s;
+}
+
+button:hover {
+  transform:scale(1.1);
+  box-shadow:0 0 15px var(--gold);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="envelope" id="env" onclick="openEnvelope()">
+  <div class="letter">with love,, your ....... ❤️</div>
+</div>
+
+<h1>Hey Khushi ❤️</h1>
+<p>I have something special for you… a little world made just for you.</p>
+
+<button onclick="goNext()">Open 🎁</button>
+
+<script>
+
+function openEnvelope(){
+  document.getElementById("env").classList.add("open");
+}
+
+/* Auto open after 1 sec */
+setTimeout(openEnvelope,1000);
+
+function goNext(){
+  window.location.href = "chat.html";
+}
+
+</script>
+
+</body>
+</html>

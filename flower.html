@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Cinematic Night</title>
+    <style>
+        :root {
+            --navy: #0A1931;
+            --deep-blue: #1A3D63;
+            --mid-blue: #4A7FA7;
+            --light-blue: #B3CFE5;
+            --pale-white: #F6FAFD;
+            --gold: #e8c97a;
+            --rose: #e8a0b0;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--navy);
+            font-family: 'Georgia', serif;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 60px 20px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        h1 {
+            color: var(--pale-white);
+            font-size: 2.5rem;
+            font-weight: 300;
+            text-shadow: 0 0 20px rgba(179, 207, 229, 0.5);
+            opacity: 0;
+            animation: fadeIn 3s forwards 1s;
+            letter-spacing: 2px;
+        }
+
+        .btn-container {
+            pointer-events: auto;
+            opacity: 0;
+            animation: fadeIn 3s forwards 4s;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, var(--gold), #c5a35d);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            color: var(--navy);
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(232, 201, 122, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 25px rgba(232, 201, 122, 0.6);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ui-overlay">
+        <h1>Blooming, just like you 🌸</h1>
+        <div class="btn-container">
+            <button class="next-btn" onclick="goNext()">Next ❤️</button>
+        </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let fireflies = [];
+        let flowers = [];
+        let frame = 0;
+
+        const colors = {
+            navy: '#0A1931',
+            deepBlue: '#1A3D63',
+            midBlue: '#4A7FA7',
+            lightBlue: '#B3CFE5',
+            paleWhite: '#F6FAFD',
+            gold: '#e8c97a',
+            rose: '#e8a0b0'
+        };
+
+        function init() {
+            resize();
+            createFireflies();
+            createFlowers();
+            animate();
+        }
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', () => {
+            resize();
+            flowers = [];
+            createFlowers();
+        });
+
+        class Firefly {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.s = Math.random() * 2;
+                this.ang = Math.random() * Math.PI * 2;
+                this.v = 0.2 + Math.random() * 0.5;
+                this.life = Math.random() * Math.PI;
+            }
+            update() {
+                this.x += Math.cos(this.ang) * this.v;
+                this.y += Math.sin(this.ang) * this.v;
+                this.ang += (Math.random() - 0.5) * 0.1;
+                this.life += 0.02;
+                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
+            }
+            draw() {
+                let opacity = (Math.sin(this.life) + 1) / 2;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.s, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(232, 201, 122, ${opacity * 0.8})`;
+                ctx.shadowBlur = 10 * opacity;
+                ctx.shadowColor = colors.gold;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        class Flower {
+            constructor(x) {
+                this.x = x;
+                this.targetHeight = 150 + Math.random() * 200;
+                this.currentHeight = 0;
+                this.swayLimit = 10 + Math.random() * 20;
+                this.swaySpeed = 0.01 + Math.random() * 0.02;
+                this.offset = Math.random() * Math.PI * 2;
+                this.petalCount = 6 + Math.floor(Math.random() * 3);
+                this.bloomScale = 0;
+                this.growthSpeed = 0.5 + Math.random() * 1.5;
+            }
+
+            draw() {
+                if (this.currentHeight < this.targetHeight) {
+                    this.currentHeight += this.growthSpeed;
+                } else if (this.bloomScale < 1) {
+                    this.bloomScale += 0.01;
+                }
+
+                const sway = Math.sin(frame * this.swaySpeed + this.offset) * this.swayLimit;
+                const topY = height - 50 - this.currentHeight;
+                const topX = this.x + sway;
+
+                // Draw Stem
+                ctx.beginPath();
+                ctx.moveTo(this.x, height - 50);
+                ctx.quadraticCurveTo(this.x, height - 50 - this.currentHeight/2, topX, topY);
+                ctx.strokeStyle = colors.deepBlue;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                if (this.bloomScale > 0) {
+                    this.drawBloom(topX, topY, this.bloomScale);
+                }
+            }
+
+            drawBloom(x, y, scale) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(Math.sin(frame * this.swaySpeed + this.offset) * 0.2);
+                
+                // Petals
+                for (let i = 0; i < this.petalCount; i++) {
+                    ctx.save();
+                    ctx.rotate((i * Math.PI * 2) / this.petalCount);
+                    
+                    const grad = ctx.createRadialGradient(0, 0, 0, 0, -20 * scale, 30 * scale);
+                    grad.addColorStop(0, colors.rose);
+                    grad.addColorStop(1, 'transparent');
+
+                    ctx.beginPath();
+                    ctx.ellipse(0, -15 * scale, 10 * scale, 20 * scale, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = grad;
+                    ctx.shadowBlur = 5 * scale;
+                    ctx.shadowColor = colors.rose;
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                // Center
+                const centerGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 8 * scale);
+                centerGrad.addColorStop(0, colors.gold);
+                centerGrad.addColorStop(1, colors.deepBlue);
+                ctx.beginPath();
+                ctx.arc(0, 0, 6 * scale, 0, Math.PI * 2);
+                ctx.fillStyle = centerGrad;
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+
+        function createFireflies() {
+            for (let i = 0; i < 40; i++) fireflies.push(new Firefly());
+        }
+
+        function createFlowers() {
+            let spacing = width / 8;
+            for (let i = 0; i < 9; i++) {
+                flowers.push(new Flower(i * spacing + (Math.random() * 40 - 20)));
+            }
+        }
+
+        function drawBackground() {
+            // Sky
+            const skyGrad = ctx.createRadialGradient(width * 0.8, height * 0.2, 0, width * 0.8, height * 0.2, width);
+            skyGrad.addColorStop(0, colors.deepBlue);
+            skyGrad.addColorStop(1, colors.navy);
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, width, height);
+
+            // Moon
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(width * 0.8, height * 0.2, 50, 0, Math.PI * 2);
+            const moonGrad = ctx.createRadialGradient(width * 0.8, height * 0.2, 0, width * 0.8, height * 0.2, 80);
+            moonGrad.addColorStop(0, colors.paleWhite);
+            moonGrad.addColorStop(0.2, colors.lightBlue);
+            moonGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = moonGrad;
+            ctx.shadowBlur = 50;
+            ctx.shadowColor = colors.lightBlue;
+            ctx.fill();
+            ctx.restore();
+
+            // Ground
+            const groundGrad = ctx.createLinearGradient(0, height - 100, 0, height);
+            groundGrad.addColorStop(0, '#050c18');
+            groundGrad.addColorStop(1, '#000000');
+            ctx.fillStyle = groundGrad;
+            ctx.beginPath();
+            ctx.moveTo(0, height);
+            ctx.lineTo(0, height - 60);
+            for(let i=0; i<=width; i+=20) {
+                ctx.lineTo(i, height - 50 - Math.sin(i * 0.01) * 10);
+            }
+            ctx.lineTo(width, height);
+            ctx.fill();
+        }
+
+        function animate() {
+            frame++;
+            ctx.clearRect(0, 0, width, height);
+            
+            drawBackground();
+
+            flowers.forEach(f => f.draw());
+            
+            ctx.globalCompositeOperation = 'lighter';
+            fireflies.forEach(f => {
+                f.update();
+                f.draw();
+            });
+            ctx.globalCompositeOperation = 'source-over';
+
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        function goNext() {
+    window.location.href = "photo.html"; // or your next page name
+}
+    </script>
+</body>
+</html>

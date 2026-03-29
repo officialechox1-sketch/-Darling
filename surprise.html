@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Surprise ❤️</title>
+    <style>
+        :root {
+            --navy: #0A1931;
+            --deep-blue: #1A3D63;
+            --mid-blue: #4A7FA7;
+            --light-blue: #B3CFE5;
+            --pale-white: #F6FAFD;
+            --gold: #e8c97a;
+            --rose: #e8a0b0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: radial-gradient(circle at center, var(--deep-blue) 0%, var(--navy) 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Georgia', serif;
+            color: var(--pale-white);
+        }
+
+        /* Cinematic Vignette & Blur Depth */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.6) 100%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Reveal Container */
+        .reveal-container {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        /* Surprise Image Styling */
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 
+                        0 0 20px rgba(232, 201, 122, 0.2);
+            opacity: 0;
+            filter: blur(20px);
+            transform: scale(0.9);
+            animation: revealMain 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            cursor: pointer;
+            transition: transform 0.6s ease, box-shadow 0.6s ease;
+        }
+
+        .image-wrapper::before {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 50%;
+            height: 300%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: rotate(45deg);
+            animation: lightSweep 4s 3s infinite;
+            z-index: 2;
+        }
+
+        .surprise-img {
+            width: 100%;
+            display: block;
+            border-radius: 20px;
+            /* Using a placeholder if surprise.png isn't present for testing, 
+               but strictly looks for 'surprise.png' as requested */
+            content: url('surprise.png'); 
+        }
+
+        /* Glow Effect */
+        .glow-overlay {
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            box-shadow: inset 0 0 30px rgba(232, 160, 176, 0.3);
+            pointer-events: none;
+            z-index: 3;
+            animation: glowPulse 4s infinite ease-in-out;
+        }
+
+        /* Text Styling */
+        .message {
+            margin-top: 30px;
+            font-size: 1.3rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            color: var(--pale-white);
+            text-shadow: 0 0 10px var(--rose);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 2s 2.5s forwards;
+        }
+
+        /* Final Button */
+        .final-btn {
+            margin-top: 40px;
+            padding: 12px 45px;
+            background: linear-gradient(135deg, var(--gold), #c5a35d);
+            border: none;
+            border-radius: 50px;
+            color: var(--navy);
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(232, 201, 122, 0.3);
+            opacity: 0;
+            transition: all 0.8s ease;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        .final-btn.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Animations */
+        @keyframes revealMain {
+            to {
+                opacity: 1;
+                filter: blur(0);
+                transform: scale(1);
+            }
+        }
+
+        @keyframes lightSweep {
+            0% { left: -100%; top: -100%; }
+            20% { left: 150%; top: 150%; }
+            100% { left: 150%; top: 150%; }
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: inset 0 0 20px rgba(232, 160, 176, 0.2), 0 0 10px rgba(232, 201, 122, 0.1); }
+            50% { box-shadow: inset 0 0 40px rgba(232, 160, 176, 0.4), 0 0 30px rgba(232, 201, 122, 0.3); }
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 480px) {
+            .message { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="reveal-container">
+        <div class="image-wrapper" id="wrapper" onclick="triggerBurst(event)">
+            <img src="surprise.png" alt="Special Surprise" class="surprise-img">
+            <div class="glow-overlay"></div>
+        </div>
+
+        <div class="message">
+            “You are my favorite surprise in life ❤️”
+        </div>
+
+        <button class="final-btn" id="finalBtn">Thankyou for using your precious time for seeing my simple surprise➝</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        const finalBtn = document.getElementById('finalBtn');
+        const wrapper = document.getElementById('wrapper');
+
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(isHeart = false, x, y) {
+                this.reset(isHeart, x, y);
+            }
+
+            reset(isHeart, x, y) {
+                this.x = x || Math.random() * width;
+                this.y = y || height + 20;
+                this.size = Math.random() * (isHeart ? 15 : 3) + 2;
+                this.speedY = Math.random() * (x ? 4 : 0.8) + 0.2;
+                if (x) this.speedY *= (Math.random() - 0.5) * 2; // Burst direction
+                this.speedX = (Math.random() - 0.5) * (x ? 4 : 0.5);
+                this.opacity = Math.random() * 0.5 + 0.3;
+                this.isHeart = isHeart;
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                this.opacity -= 0.005;
+                if (this.opacity <= 0) this.reset(this.isHeart);
+            }
+
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.isHeart ? '#e8a0b0' : '#F6FAFD';
+                if (this.isHeart) {
+                    ctx.font = `${this.size}px serif`;
+                    ctx.fillText('❤️', this.x, this.y);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < 70; i++) {
+                particles.push(new Particle(i % 12 === 0));
+            }
+            animate();
+
+            // Reveal button after the animations settle
+            setTimeout(() => {
+                finalBtn.classList.add('visible');
+            }, 5000);
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        function triggerBurst(e) {
+            // Haptic-style feedback
+            wrapper.style.transform = "scale(1.05)";
+            setTimeout(() => wrapper.style.transform = "scale(1)", 200);
+
+            // Heart Burst
+            for (let i = 0; i < 10; i++) {
+                particles.push(new Particle(true, e.clientX, e.clientY));
+                // Remove the extra particles later to keep performance stable
+                setTimeout(() => particles.shift(), 3000);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
